@@ -42,8 +42,9 @@ button{border:0;border-radius:999px;font-weight:800;letter-spacing:.04em;cursor:
 .board{display:grid;grid-template-columns:repeat(7,1fr);gap:5px;touch-action:none;user-select:none;-webkit-user-select:none}
 .cell{aspect-ratio:1;min-width:0;border-radius:50%;padding:2px;background:linear-gradient(145deg,#fff,#e9e0f2);box-shadow:inset 0 2px 4px #59436a18,0 2px 3px #5b46701c;position:relative;transition:transform .08s}
 .cell img{width:100%;height:100%;border-radius:50%;object-fit:cover;display:block;border:2px solid #fffdf9;pointer-events:none}
-.cell.selected{transform:scale(.88);box-shadow:0 0 0 3px #d4b75e,0 0 14px #e9ce75}
-.cell.last:after{content:"";position:absolute;inset:-2px;border:2px solid #c6a64e;border-radius:50%;pointer-events:none}
+.cell.selected{transform:scale(.86);z-index:2;box-shadow:0 0 0 5px #f0b400,0 0 0 8px #fffdf0,0 0 0 10px #69528e,0 0 16px 6px #f4d56a}
+.cell.last{z-index:3}
+.cell.last:after{content:"";position:absolute;inset:-4px;border:4px solid #e0457b;border-radius:50%;pointer-events:none}
 .pathline{height:23px;text-align:center;font-size:11px;color:#927eaa;padding-top:5px}
 .controls{display:flex;justify-content:center;gap:8px;flex-wrap:wrap;margin:8px 0 3px}
 .controls button{font-size:11px}
