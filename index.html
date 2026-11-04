@@ -1,0 +1,221 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#eee8fb">
+<title>星つなぎ - オリジナルキャラクターパズル</title>
+<style>
+:root{--lav:#eee8fb;--lav2:#d9c9f2;--deep:#69528e;--gold:#d7b96d;--gold2:#f4e5b5;--ink:#403653;--white:#fffdfb}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%;font-family:-apple-system,BlinkMacSystemFont,"Hiragino Kaku Gothic ProN","Yu Gothic",sans-serif;color:var(--ink);background:radial-gradient(circle at 15% 5%,#fff 0,transparent 25%),linear-gradient(145deg,#f5f0ff,#e9e0f5 55%,#fff8e9);overscroll-behavior:none}
+body{padding:env(safe-area-inset-top) 14px env(safe-area-inset-bottom);display:flex;justify-content:center}
+.app{width:min(100%,520px);padding:15px 0 8px;min-height:100dvh;display:flex;flex-direction:column}
+header{text-align:center;margin-bottom:12px}
+.kicker{font-size:10px;letter-spacing:.25em;color:#9b83b9;font-weight:800}
+h1{margin:3px 0 0;font-size:clamp(26px,7vw,34px);letter-spacing:.08em;color:#665184;text-shadow:0 2px 0 white}
+.subtitle{font-size:11px;color:#8a789f;margin-top:2px}
+.sparkle{color:#c7a64e}
+.panel{background:#ffffffc9;border:1px solid #e4d8f1;border-radius:22px;box-shadow:0 8px 24px #735b8b18;padding:13px}
+.upload-title{font-size:14px;font-weight:800;margin:0 0 4px}
+.help{font-size:11px;line-height:1.55;color:#81738e;margin:0 0 10px}
+.slots{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.slot{position:relative;aspect-ratio:1;border:1.5px dashed #c7b4df;border-radius:17px;background:linear-gradient(145deg,#fff,#f1eafa);overflow:hidden;display:flex;align-items:center;justify-content:center;cursor:pointer}
+.slot img{width:100%;height:100%;object-fit:cover;display:none}
+.slot.loaded img{display:block}
+.slot .placeholder{font-size:10px;color:#927eaa;text-align:center;line-height:1.5;padding:3px}
+.slot.loaded .placeholder{display:none}
+.slot b{position:absolute;left:5px;top:5px;width:20px;height:20px;border-radius:50%;background:#fffdf0;color:#987b36;display:grid;place-items:center;font-size:11px;box-shadow:0 1px 5px #0002}
+.slot input{position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer}
+.upload-actions{display:flex;gap:8px;align-items:center;margin-top:10px}
+.small{font-size:10px;color:#8b7d99;flex:1}
+button{border:0;border-radius:999px;font-weight:800;letter-spacing:.04em;cursor:pointer}
+.primary{background:linear-gradient(135deg,#9276ba,#6e5797);color:white;padding:12px 22px;box-shadow:0 4px 10px #6e579733}
+.primary:disabled{opacity:.4;cursor:not-allowed}
+.ghost{background:#f5effb;color:#765f98;border:1px solid #e2d5ef;padding:9px 12px}
+.stats{display:grid;grid-template-columns:1.15fr 1fr 1fr;gap:8px;margin:12px 0 9px}
+.stat{background:#fffdfbdb;border:1px solid #e8def1;border-radius:16px;text-align:center;padding:8px 3px;box-shadow:0 3px 10px #735b8b0c}
+.stat label{display:block;font-size:9px;color:#9a89a8;letter-spacing:.08em}
+.stat strong{font-size:21px;color:#665184;font-variant-numeric:tabular-nums}
+.stat.time strong{color:#ad8a37}
+.board-wrap{position:relative;padding:9px;border-radius:23px;background:linear-gradient(135deg,#d9c9f2,#f6e8bd,#d8c8ed);box-shadow:0 8px 22px #604d7b22}
+.board{display:grid;grid-template-columns:repeat(7,1fr);gap:5px;touch-action:none;user-select:none;-webkit-user-select:none}
+.cell{aspect-ratio:1;min-width:0;border-radius:50%;padding:2px;background:linear-gradient(145deg,#fff,#e9e0f2);box-shadow:inset 0 2px 4px #59436a18,0 2px 3px #5b46701c;position:relative;transition:transform .08s}
+.cell img{width:100%;height:100%;border-radius:50%;object-fit:cover;display:block;border:2px solid #fffdf9;pointer-events:none}
+.cell.selected{transform:scale(.88);box-shadow:0 0 0 3px #d4b75e,0 0 14px #e9ce75}
+.cell.last:after{content:"";position:absolute;inset:-2px;border:2px solid #c6a64e;border-radius:50%;pointer-events:none}
+.pathline{height:23px;text-align:center;font-size:11px;color:#927eaa;padding-top:5px}
+.controls{display:flex;justify-content:center;gap:8px;flex-wrap:wrap;margin:8px 0 3px}
+.controls button{font-size:11px}
+#overlay{position:absolute;inset:9px;border-radius:16px;background:#f8f4fff0;display:none;align-items:center;justify-content:center;text-align:center;padding:20px;backdrop-filter:blur(5px)}
+#overlay.show{display:flex}
+.overlay-card h2{margin:0 0 6px;color:#6c568e;font-size:25px}
+.overlay-card p{font-size:12px;line-height:1.6;color:#786b87}
+.result{font-size:20px;font-weight:900;color:#a1843f}
+footer{margin-top:auto;text-align:center;padding:13px 4px 3px;font-size:10px;color:#9b8ca8;letter-spacing:.04em}
+footer .line{width:48px;height:1px;background:linear-gradient(90deg,transparent,#d3bd7a,transparent);margin:0 auto 7px}
+.hidden{display:none!important}
+@media(max-width:360px){.app{padding-top:10px}.board{gap:3px}.board-wrap{padding:7px}.panel{padding:10px}.stats{gap:5px}.stat strong{font-size:18px}}
+</style>
+</head>
+<body>
+<main class="app">
+<header>
+ <div class="kicker"><span class="sparkle">✦</span> LAVENDER & GOLD PUZZLE <span class="sparkle">✦</span></div>
+ <h1>星つなぎ</h1>
+ <div class="subtitle">お気に入りの仲間を、指先でつなごう</div>
+</header>
+
+<section class="panel" id="setup">
+ <p class="upload-title">✧ ４人のキャラクターをセット</p>
+ <p class="help">それぞれの枠をタップして、スマートフォン内の画像を1枚ずつ選んでください。画像はこの端末内で表示するだけで、外部へ送信されません。</p>
+ <div class="slots" id="slots">
+  <label class="slot"><b>1</b><span class="placeholder">画像を選択</span><img alt="キャラクター1"><input type="file" accept="image/*" aria-label="キャラクター1の画像"></label>
+  <label class="slot"><b>2</b><span class="placeholder">画像を選択</span><img alt="キャラクター2"><input type="file" accept="image/*" aria-label="キャラクター2の画像"></label>
+  <label class="slot"><b>3</b><span class="placeholder">画像を選択</span><img alt="キャラクター3"><input type="file" accept="image/*" aria-label="キャラクター3の画像"></label>
+  <label class="slot"><b>4</b><span class="placeholder">画像を選択</span><img alt="キャラクター4"><input type="file" accept="image/*" aria-label="キャラクター4の画像"></label>
+ </div>
+ <div class="upload-actions"><span class="small" id="uploadStatus">4枚選ぶとゲームを開始できます</span><button class="primary" id="startBtn" disabled>ゲーム開始 ✦</button></div>
+</section>
+
+<section id="game" class="hidden">
+ <div class="stats">
+  <div class="stat"><label>SCORE</label><strong id="score">0</strong></div>
+  <div class="stat time"><label>TIME</label><strong id="time">60</strong></div>
+  <div class="stat"><label>MAX CHAIN</label><strong id="maxChain">0</strong></div>
+ </div>
+ <div class="board-wrap">
+  <div class="board" id="board" aria-label="パズル盤面"></div>
+  <div id="overlay">
+   <div class="overlay-card">
+    <h2 id="overlayTitle">PAUSE</h2>
+    <p id="overlayText">ひと休みしましょう。</p>
+    <div class="result" id="finalScore"></div>
+    <button class="primary" id="overlayBtn">再開する</button>
+   </div>
+  </div>
+ </div>
+ <div class="pathline" id="pathHint">同じキャラクターを３つ以上つなごう ✧ 斜めもOK</div>
+ <div class="controls">
+  <button class="ghost" id="pauseBtn">Ⅱ 一時停止</button>
+  <button class="ghost" id="restartBtn">↻ リプレイ</button>
+  <button class="ghost" id="soundBtn">♫ 音 ON</button>
+ </div>
+</section>
+
+<footer><div class="line"></div>© 2026 しげちーSS　|　Original Character Puzzle</footer>
+</main>
+<script>
+(()=>{
+const $=id=>document.getElementById(id);
+const SIZE=7, DURATION=60;
+let images=[], grid=[], score=0, maxChain=0, timeLeft=DURATION, timer=null;
+let running=false, paused=false, soundOn=true, path=[], pointerActive=false, audioCtx=null;
+const board=$('board');
+
+document.querySelectorAll('.slot input').forEach((input,i)=>{
+ input.addEventListener('change',()=>{
+  const file=input.files&&input.files[0]; if(!file)return;
+  if(!file.type.startsWith('image/'))return;
+  const reader=new FileReader();
+  reader.onload=()=>{
+   images[i]=reader.result;
+   const slot=input.closest('.slot');slot.querySelector('img').src=reader.result;slot.classList.add('loaded');
+   const n=images.filter(Boolean).length;
+   $('uploadStatus').textContent=`${n}/4 枚セット済み`;
+   $('startBtn').disabled=n!==4;
+  };
+  reader.readAsDataURL(file);
+ });
+});
+function rand(){return Math.floor(Math.random()*4)}
+function makeGrid(){grid=Array.from({length:SIZE*SIZE},rand)}
+function render(){
+ board.innerHTML='';
+ grid.forEach((v,i)=>{
+  const cell=document.createElement('div');cell.className='cell';cell.dataset.index=i;
+  const img=document.createElement('img');img.src=images[v];img.alt='';img.draggable=false;
+  cell.appendChild(img);board.appendChild(cell);
+ });
+ drawPath();
+}
+function drawPath(){
+ board.querySelectorAll('.cell').forEach(c=>{c.classList.remove('selected','last')});
+ path.forEach((idx,i)=>{const c=board.children[idx];if(c){c.classList.add('selected');if(i===path.length-1)c.classList.add('last')}});
+ $('pathHint').textContent=path.length?`${path.length} 個つながっています ✦`:'同じキャラクターを３つ以上つなごう ✧ 斜めもOK';
+}
+function neighbors(a,b){
+ const ar=Math.floor(a/SIZE),ac=a%SIZE,br=Math.floor(b/SIZE),bc=b%SIZE;
+ return Math.max(Math.abs(ar-br),Math.abs(ac-bc))===1;
+}
+function cellFromPoint(x,y){
+ const el=document.elementFromPoint(x,y);const cell=el&&el.closest('.cell');
+ return cell&&board.contains(cell)?Number(cell.dataset.index):null;
+}
+function begin(x,y){
+ if(!running||paused)return;
+ const idx=cellFromPoint(x,y);if(idx===null)return;
+ path=[idx];pointerActive=true;drawPath();
+}
+function move(x,y){
+ if(!pointerActive||!running||paused)return;
+ const idx=cellFromPoint(x,y);if(idx===null||path.includes(idx))return;
+ const last=path[path.length-1];
+ if(neighbors(last,idx)&&grid[idx]===grid[path[0]]){path.push(idx);drawPath();if(soundOn&&path.length%3===0)beep(620+path.length*25,.035)}
+}
+function end(){
+ if(!pointerActive)return;pointerActive=false;
+ if(path.length>=3)clearPath();
+ else {path=[];drawPath()}
+}
+board.addEventListener('pointerdown',e=>{e.preventDefault();board.setPointerCapture(e.pointerId);begin(e.clientX,e.clientY)});
+board.addEventListener('pointermove',e=>{if(pointerActive){e.preventDefault();move(e.clientX,e.clientY)}});
+board.addEventListener('pointerup',end);
+board.addEventListener('pointercancel',end);
+function clearPath(){
+ const n=path.length;score+=n*n*10;maxChain=Math.max(maxChain,n);
+ $('score').textContent=score.toLocaleString('ja-JP');$('maxChain').textContent=maxChain;
+ const removed=[...path];path=[];
+ // Drop remaining pieces downward in each column, then refill from the top.
+ for(let col=0;col<SIZE;col++){
+  const kept=[];
+  for(let row=SIZE-1;row>=0;row--){const idx=row*SIZE+col;if(!removed.includes(idx))kept.push(grid[idx])}
+  while(kept.length<SIZE)kept.push(rand());
+  for(let row=SIZE-1,k=0;row>=0;row--,k++)grid[row*SIZE+col]=kept[k];
+ }
+ render();
+ if(soundOn)beep(740+Math.min(n,10)*45,.12);
+ $('pathHint').textContent=`${n} CHAIN! +${(n*n*10).toLocaleString('ja-JP')} 点 ✨`;
+}
+function beep(freq,duration){
+ try{audioCtx=audioCtx||new (window.AudioContext||window.webkitAudioContext)();if(audioCtx.state==='suspended')audioCtx.resume();const o=audioCtx.createOscillator(),g=audioCtx.createGain();o.type='sine';o.frequency.value=freq;g.gain.setValueAtTime(.045,audioCtx.currentTime);g.gain.exponentialRampToValueAtTime(.001,audioCtx.currentTime+duration);o.connect(g);g.connect(audioCtx.destination);o.start();o.stop(audioCtx.currentTime+duration)}catch(e){}
+}
+function updateTime(){ $('time').textContent=timeLeft;if(timeLeft<=10)$('time').style.color='#c66b66';else $('time').style.color='';}
+function startTimer(){clearInterval(timer);timer=setInterval(()=>{if(!running||paused)return;timeLeft--;updateTime();if(timeLeft<=0)finish()},1000)}
+function newGame(){
+ clearInterval(timer);score=0;maxChain=0;timeLeft=DURATION;paused=false;running=true;path=[];
+ $('score').textContent='0';$('maxChain').textContent='0';$('time').textContent='60';$('time').style.color='';
+ $('overlay').classList.remove('show');$('pauseBtn').textContent='Ⅱ 一時停止';
+ makeGrid();render();startTimer();
+}
+function showOverlay(title,desc,button,final=''){
+ $('overlayTitle').textContent=title;$('overlayText').textContent=desc;$('overlayBtn').textContent=button;$('finalScore').textContent=final;$('overlay').classList.add('show');
+}
+function finish(){
+ clearInterval(timer);running=false;paused=false;
+ showOverlay('TIME UP!','おつかれさまでした。もう一度チャレンジしますか？','もう一度プレイ',`SCORE  ${score.toLocaleString('ja-JP')} 点`);
+}
+function pause(){
+ if(!running)return;paused=!paused;
+ if(paused){showOverlay('PAUSE','星たちもひと休み。準備ができたら再開しましょう。','再開する');$('pauseBtn').textContent='▶ 再開'}
+ else{$('overlay').classList.remove('show');$('pauseBtn').textContent='Ⅱ 一時停止'}
+}
+$('startBtn').addEventListener('click',()=>{if(images.filter(Boolean).length===4){$('setup').classList.add('hidden');$('game').classList.remove('hidden');newGame()}});
+$('pauseBtn').addEventListener('click',pause);
+$('restartBtn').addEventListener('click',()=>{if(confirm('現在のスコアをリセットして最初から遊びますか？'))newGame()});
+$('overlayBtn').addEventListener('click',()=>{if(!running){newGame();return}paused=false;$('overlay').classList.remove('show');$('pauseBtn').textContent='Ⅱ 一時停止'});
+$('soundBtn').addEventListener('click',()=>{soundOn=!soundOn;$('soundBtn').textContent=soundOn?'♫ 音 ON':'♪ 音 OFF';if(soundOn)beep(660,.08)});
+})();
+</script>
+</body>
+</html>
