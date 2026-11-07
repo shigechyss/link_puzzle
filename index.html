@@ -78,6 +78,18 @@ footer .line{width:48px;height:1px;background:linear-gradient(90deg,transparent,
 .reward.done .reward-meta{color:#a1843f;font-weight:800}
 .reward-foot{display:flex;justify-content:flex-end;margin-top:8px}
 .reward-foot .ghost{font-size:10px;padding:6px 10px}
+
+/* ===== 遊び方 ===== */
+.howto{margin-top:12px}
+.howto summary{cursor:pointer;font-size:14px;font-weight:800;list-style:none;display:flex;align-items:center;justify-content:space-between;color:#4f3f68}
+.howto summary::-webkit-details-marker{display:none}
+.howto summary:after{content:"▾";color:#ad8a37;transition:transform .2s}
+.howto:not([open]) summary:after{transform:rotate(-90deg)}
+.howto ol{margin:10px 0 0;padding:0;list-style:none;counter-reset:h}
+.howto li{counter-increment:h;position:relative;padding:0 0 0 28px;margin-bottom:8px;font-size:12px;line-height:1.65;color:#6c5e7a}
+.howto li:before{content:counter(h);position:absolute;left:0;top:1px;width:19px;height:19px;border-radius:50%;background:linear-gradient(145deg,#e8cf7e,#c9a64a);color:#fff;font-size:11px;font-weight:900;text-align:center;line-height:19px}
+.howto li b{color:#8a6f2c}
+.howto .tip{margin:2px 0 0;padding:8px 10px;border-radius:12px;background:#f6effb;font-size:11px;line-height:1.6;color:#81738e}
 </style>
 </head>
 <body>
@@ -124,6 +136,18 @@ footer .line{width:48px;height:1px;background:linear-gradient(90deg,transparent,
   <button class="ghost" id="soundBtn">♫ 音 ON</button>
  </div>
 </section>
+
+<details class="panel howto" id="howto" open>
+ <summary>✧ 遊び方</summary>
+ <ol>
+  <li><b>同じキャラクター</b>が隣り合っているところを、<b>指でなぞって</b>つなぎます。斜めの隣もつなげられます。</li>
+  <li><b>3つ以上</b>つないで指を離すと、キャラが消えて得点になります。2つ以下で離すと、つなぎ直せます。</li>
+  <li>長くつなぐほど高得点！ 点数は「つないだ数 × つないだ数 × 10点」です。<br>例：3個＝90点、5個＝250点、10個＝1,000点</li>
+  <li>消えた分は上から新しいキャラが落ちてきます。<b>制限時間は60秒</b>、ハイスコアを目指しましょう。</li>
+  <li>点数がたまると、下の「ご褒美画像」が少しずつ見えてきます。</li>
+ </ol>
+ <p class="tip">💡 ゲームを止めたいときは「一時停止」、最初からやり直したいときは「リプレイ」を押してください。</p>
+</details>
 
 <section class="panel" id="rewards">
  <p class="upload-title">✧ ご褒美画像</p>
